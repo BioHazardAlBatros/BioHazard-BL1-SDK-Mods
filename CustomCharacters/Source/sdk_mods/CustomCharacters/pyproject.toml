@@ -1,0 +1,13 @@
+[project]
+name = "Custom Characters"
+version = "1.0.0"
+authors = [{ name = "BioHazard" }]
+description = "Allows to create new saves for custom characters and PT3 characters."
+
+[tool.sdkmod]
+name = "Custom Characters"
+mod_type = "Standard" # or "Library"
+supported_games = "BL1"
+coop_support = "Unknown"
+auto_enable = "True"
+license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }

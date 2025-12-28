@@ -1,0 +1,7 @@
+Simple demo of Custom Characters mod.
+
+Adds support for creating a new character as Blitz.
+
+Requirements:
+   The Blitz .upk archive has to be present in the "Borderlands\WillowGame\CookedPC" folder
+   You can get it from the mod archive on Nexus
