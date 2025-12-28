@@ -2,13 +2,24 @@ import os
 import unrealsdk
 from pathlib import Path
 from mods_base import hook, get_pc, build_mod, SETTINGS_DIR, ENGINE
-from unrealsdk.hooks import Type, Block
+from unrealsdk.hooks import Type, Block, Unset
 from unrealsdk.unreal import UObject, WrappedStruct, BoundFunction
 from unrealsdk import logging, load_package,find_object
 from ui_utils import OptionBox, OptionBoxButton
 from typing import List, Dict, Optional, Callable
 
 from .vault_hunters import VaultHunter, _VAULT_HUNTERS
+
+@hook(
+    hook_func="WillowGame.WillowGFxMenuHelperSaveGame:GetCharName",
+    hook_type=Type.PRE,
+)
+def Display(obj: UObject, args: WrappedStruct, ret: any, func):
+    # ClassName is an enum of 5 possible values
+    if args.ClassName == 4:
+        return (Block, "Custom")
+    classname = _VAULT_HUNTERS[args.ClassName].classname if args.bWantClassName else _VAULT_HUNTERS[args.ClassName].defaultName
+    return (Block,classname)
 
 @hook(
     hook_func="WillowGame.WillowGFxLobbyLoadCharacter:extNewCharacter",
@@ -45,6 +56,7 @@ def HandleNewCharacter(obj: UObject, args: WrappedStruct, ret: any, func):
             profile.PlotMissionNumber = 1
             profile.LastVisitedTeleporter = "Fyrestone"
             profile.InventorySlotData.InventorySlotMax_Misc = 72
+        profile.UIPreferences.CharacterName = selected_info.defaultName
         WSM.SetCachedPlayerProfile(ControllerID, profile)    
         charData = unrealsdk.make_struct("PlayerSaveData",CharacterClass=selected_info.charID,ExpLevel=1,CharacterName=selected_info.classname)
         li = unrealsdk.make_struct("LoadInfo")

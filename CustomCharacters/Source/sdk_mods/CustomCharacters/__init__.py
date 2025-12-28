@@ -8,10 +8,10 @@ from unrealsdk import logging, load_package,find_object
 from ui_utils import OptionBox, OptionBoxButton
 from typing import List, Dict, Optional, Callable
 
-from .hooks import SetupNewCharacterMenu, HandleNewCharacter
+from .hooks import SetupNewCharacterMenu, HandleNewCharacter, Display
 from .vault_hunters import VaultHunter, _VAULT_HUNTERS
 
-def add_custom_character_class(NewClassname:str, NewCharDesc: str, NewPlayerClassDefinition: str, BaseVanillaClass: int = 0, PlayerProfileDefinition:str = ""):
+def add_custom_character_class(NewClassname:str, NewCharDesc: str, NewPlayerClassDefinition: str, NewName:str,BaseVanillaClass: int = 0):
     if BaseVanillaClass < 0 or BaseVanillaClass > 3:
         BaseVanillaClass = 0
     
@@ -22,6 +22,7 @@ def add_custom_character_class(NewClassname:str, NewCharDesc: str, NewPlayerClas
         classname = NewClassname,
         charDesc = NewCharDesc,
         playerClassDefinition = NewPlayerClassDefinition,
+        defaultName = NewName,
         defaultProfile = _VAULT_HUNTERS[BaseVanillaClass].defaultProfile,
         isCustom = True
     ))
@@ -40,7 +41,7 @@ def get_character_info(charID: int):
     return None
 
 build_mod(
-    hooks=[SetupNewCharacterMenu,HandleNewCharacter],
+    hooks=[SetupNewCharacterMenu,HandleNewCharacter,Display],
     options=[],
     settings_file=Path(f"{SETTINGS_DIR}/CustomCharacters.json")
 )

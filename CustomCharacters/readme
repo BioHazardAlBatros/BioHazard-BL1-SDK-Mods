@@ -11,3 +11,9 @@ Installing Playthrough 3 mod isn't a requirement, the mod will still work.
 
 Limitation:
     The mod will OVERRIDE the vanilla behaviour of pressing "New Character", skipping Bus Character Selection screen entirely.
+    The mod may make the game prone to crashes during selection screen opening.
+
+Updates:
+
+- 1.0.1:
+  Now selection menu displays "Custom" string as a classname for custom characters (was empty before)
