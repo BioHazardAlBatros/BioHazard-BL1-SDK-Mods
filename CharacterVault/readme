@@ -1,0 +1,29 @@
+Mostly resource for modders and those who have Playthrough 3 installed.
+- Stores strings for all registered PlayerClassDefinition and provides a function to get it. 
+  If your mod somehow works with PlayerClassDefinition object of vanilla characters
+  and you want to add support for non vanilla characters too, 
+  you can iterate on the result of the aforementioned function.
+
+- Adds support for creating new saves of custom characters in-game
+- Adds support for creating new PT3 characters (if PT3 is installed)
+
+Installing Playthrough 3 mod isn't a requirement, the mod will still work.
+
+Warning:
+    The mod will OVERRIDE the vanilla behaviour of pressing "New Character", skipping Bus Character Selection screen entirely.
+
+Updates:
+
+- 1.0.4:
+  Mod renamed
+  Moved playthrough selection from buttons to a dialogue box due to game being very crash prone before
+  Option to create PT3 character is available from the start now (Had to be unlocked before)
+
+- 1.0.3:
+  Fixed invalid experience amount on new high level characters
+
+- 1.0.2:
+  Added an option to create a high level PT3 character
+
+- 1.0.1:
+  Now selection menu displays "Custom" string as a classname for custom characters (was empty before)

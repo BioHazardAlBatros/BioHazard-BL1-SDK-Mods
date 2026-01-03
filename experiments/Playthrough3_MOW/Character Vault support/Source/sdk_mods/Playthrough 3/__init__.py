@@ -11,7 +11,6 @@ from mods_base import build_mod#type: ignore
 from unrealsdk import logging, find_object#type: ignore
 from ui_utils import OptionBox, OptionBoxButton
 
-bGlobalPT3Unlocked = os.path.exists(SETTINGS_DIR / "PT3GlobalUnlocker")
 bPrepWorkDone = False
 
 GameStage: SliderOption = SliderOption("Playthrough 3 Base Level",
@@ -23,7 +22,6 @@ GameStage: SliderOption = SliderOption("Playthrough 3 Base Level",
             description="The base level for enemies and missions will be set to character level plus this number.",
             on_change = lambda _, 
             new_value: SetGlobalGameStage(_, new_value))
-
 
 GlobalsDef = None
 GlobalGameStage = None
@@ -326,7 +324,6 @@ def SetGlobalGameStage(_: SliderOption, new_value: float):
     hook_type=Type.PRE,
 )
 def FinishLoadGame(obj: UObject, args: WrappedStruct, ret: any, func: BoundFunction):
-    global bGlobalPT3Unlocked
     global WillowGFxLobbySinglePlayer
     global ResetRequested
     WillowGFxLobbySinglePlayer = obj
@@ -373,9 +370,6 @@ def FinishLoadGame(obj: UObject, args: WrappedStruct, ret: any, func: BoundFunct
             Dlg.AutoAppendButton('Cancel')
             Dlg.ApplyLayout()
             Dlg.SetDefaultButton('Dif2', False)
-            if not bGlobalPT3Unlocked:
-                Path(SETTINGS_DIR / "PT3GlobalUnlocker").touch() # Unlocks option to create New PT3 Characters
-                bGlobalPT3Unlocked = True  
         else:
             obj.LaunchSaveGame(Profile.PlaythroughsCompleted)
 

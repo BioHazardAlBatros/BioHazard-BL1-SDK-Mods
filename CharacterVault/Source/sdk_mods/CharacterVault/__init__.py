@@ -41,12 +41,12 @@ def get_character_info(charID: int):
     return None
 
 build_mod(
-    hooks=[SetupNewCharacterMenu,HandleNewCharacter,Display],
+    hooks=[HandleNewCharacter,Display],
     options=[],
-    settings_file=Path(f"{SETTINGS_DIR}/CustomCharacters.json")
+    settings_file=Path(f"{SETTINGS_DIR}/CharacterVault.json")
 )
 
-__version__: str = "1.0.0"
-__version_info__: tuple[int, ...] = (1, 0, 0)
+__version__: str
+__version_info__: tuple[int, ...]
 
-logging.info(f"Custom Characters Loaded: {__version__}, {__version_info__}")
+logging.info(f"Character Vault Loaded: {__version__}, {__version_info__}")
