@@ -7,7 +7,7 @@ from unrealsdk.unreal import UObject, WrappedStruct, BoundFunction
 from unrealsdk import logging, load_package,find_object
 from ui_utils import OptionBox, OptionBoxButton
 from typing import List, Dict, Optional, Callable
-from CustomCharacters import add_custom_character_class
+from CharacterVault import add_custom_character_class
 import sys
 
 @hook(
