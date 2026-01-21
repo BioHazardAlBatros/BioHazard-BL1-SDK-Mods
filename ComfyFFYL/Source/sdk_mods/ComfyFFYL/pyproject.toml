@@ -1,0 +1,14 @@
+[project]
+name = "Comfy FFYL"
+version = "1.0.0"
+authors = [{ name = "BioHazardAlBatros" }]
+description = "Makes FFYL less annoying by removing constant rotation and screen graying out."
+
+[tool.sdkmod]
+name = "Comfy FFYL"
+mod_type = "Standard" # or "Library"
+supported_games = ["BL1"]
+coop_support = "Unknown"
+auto_enable = "True"
+download = "https://github.com/BioHazardAlBatros/BioHazard-BL1-SDK-Mods/raw/refs/heads/master/ComfyFFYL/ComfyFFYL.sdkmod"
+license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }
