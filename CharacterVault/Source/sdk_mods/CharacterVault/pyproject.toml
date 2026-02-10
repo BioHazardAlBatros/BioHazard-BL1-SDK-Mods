@@ -1,6 +1,6 @@
 [project]
 name = "Character Vault"
-version = "1.0.4"
+version = "1.0.5"
 authors = [{ name = "BioHazardAlBatros" }]
 description = "Allows to create new saves for custom characters and PT3 characters."
 
@@ -9,6 +9,6 @@ name = "Character Vault"
 mod_type = "Standard" # or "Library"
 supported_games = ["BL1"]
 coop_support = "Unknown"
-auto_enable = "True"
+auto_enable = true
 download = "https://github.com/BioHazardAlBatros/BioHazard-BL1-SDK-Mods/raw/refs/heads/master/CharacterVault/CharacterVault.sdkmod"
 license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }

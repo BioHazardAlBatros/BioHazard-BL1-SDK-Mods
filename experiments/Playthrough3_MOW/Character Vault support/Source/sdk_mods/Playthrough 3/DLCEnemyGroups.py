@@ -103,5 +103,7 @@ DLCEnemyDefinitionsList = [
     "dlc2_gd_Balance_Creatures.Skags.dlc2_Balance_Skag_Pup",
     "dlc2_gd_Balance_Creatures.Skags.dlc2_Balance_Skag_Shock_Champion",
     "dlc2_gd_Balance_Creatures.Skags.dlc2_Balance_Skag_Spitter",
-    "dlc2_gd_Balance_Creatures.Skags.dlc2_Balance_Skag_Whelp"
+    "dlc2_gd_Balance_Creatures.Skags.dlc2_Balance_Skag_Whelp",
+    "dlc4_gd_Balance_Enemies.NedTrap.Pawn_Balance_NedTrap",
+    "dlc4_gd_Balance_Enemies.NedTrap.Pawn_Balance_UndeadNedTrap"
 ]
