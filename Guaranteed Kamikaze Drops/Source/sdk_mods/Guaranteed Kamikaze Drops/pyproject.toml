@@ -1,0 +1,13 @@
+[project]
+name = "Guaranteed Kamikaze Drops"
+version = "1.0.0"
+authors = [{ name = "BioHazardAlBatros" }]
+description = "Speeds up MINAC farming for item collection achievements."
+
+[tool.sdkmod]
+name = "Guaranteed Kamikaze Drops"
+mod_type = "Standard" # or "Library"
+supported_games = ["BL1"]#,"BL1E"]
+coop_support = "Unknown"
+auto_enable = true
+license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }
