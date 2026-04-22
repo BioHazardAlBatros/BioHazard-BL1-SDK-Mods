@@ -13,6 +13,8 @@ Warning:
     The mod will OVERRIDE the vanilla behaviour of pressing "New Character", skipping Bus Character Selection screen entirely.
 
 Updates:
+- 1.1.0:
+  Added early proper support for new characters (allowed to make the game consider new character to be a completely new different class)
 
 - 1.0.5:
   i forgot what i changed

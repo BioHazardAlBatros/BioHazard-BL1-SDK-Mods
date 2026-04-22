@@ -1,45 +1,27 @@
 import unrealsdk
 from mods_base import build_mod, ENGINE
 from unrealsdk import logging
+from unrealsdk.hooks import Type, Block, add_hook, remove_hook
 from typing import List, Dict, Optional, Callable
 
-from .hooks import HandleNewCharacter, Display
+from .hooks import HandleNewCharacter, Display, PostSavesUpdated, OnSpawn, IsPlayerRestricted,TranslateUseFailure
 from .vault_hunters import VaultHunter, _VAULT_HUNTERS
+from .api import add_custom_character_class, get_character_definitions, get_character_count,get_character_info
+from .ui import InventoryVendorScreen, BankScreen, PickupScreen, RewardsScreen
 
-def add_custom_character_class(NewClassname:str, NewCharDesc: str, NewPlayerClassDefinition: str, NewName:str,BaseVanillaClass: int = 0):
-    if BaseVanillaClass < 0 or BaseVanillaClass > 3:
-        BaseVanillaClass = 0
-    
-    newID = len(_VAULT_HUNTERS)
-    _VAULT_HUNTERS.append(
-    VaultHunter(
-        charID = len(_VAULT_HUNTERS),
-        classname = NewClassname,
-        charDesc = NewCharDesc,
-        playerClassDefinition = NewPlayerClassDefinition,
-        defaultName = NewName,
-        defaultProfile = _VAULT_HUNTERS[BaseVanillaClass].defaultProfile,
-        isCustom = True
-    ))
-    
-    return newID
+add_hook("WillowGame.ItemPickupGFxMovie:UpdateCompareAgainstThing", Type.POST, "pickup", PickupScreen)
+add_hook("WillowGame.StatusMenuExGFxMovie:UpdateCardPanelWithCurrentActiveListEntry", Type.POST, "inv_mouse", InventoryVendorScreen)
+add_hook("WillowGame.StatusMenuExGFxMovie:extCard2Visible", Type.POST, "inv_compare", InventoryVendorScreen)
+add_hook("WillowGame.StatusMenuExGFxMovie:UpdateCardPanelWithCurrentCell", Type.POST, "inv_equip", InventoryVendorScreen)
+add_hook("WillowGame.VendingMachineGFxMovie:UpdateCardPanelWithCurrentActiveListEntry", Type.POST, "vendor_mouse", InventoryVendorScreen)
+add_hook("WillowGame.VendingMachineGFxMovie:extCard2Visible", Type.POST, "vendor_compare", InventoryVendorScreen)
+add_hook("WillowGame.VendingMachineGFxMovie:UpdateCardPanelWithItemOfTheDay", Type.POST, "vendor_item", InventoryVendorScreen)
+add_hook("WillowGame.BankGFxMovie:UpdateCardPanelWithCurrentActiveListEntry", Type.POST, "bank_mouse", BankScreen)
+add_hook("WillowGame.BankGFxMovie:extCard2Visible", Type.POST, "bank_compare", BankScreen)
+add_hook("WillowGame.QuestAcceptGFxMovie:extSetUpRewardsPage", Type.POST, "rewards_screen", RewardsScreen)
 
-def get_character_definitions():
-    return [vh.playerClassDefinition for vh in _VAULT_HUNTERS]
 
-## Probably redundant ##
-
-def get_character_count():
-    return len(_VAULT_HUNTERS)
-
-def get_character_info(charID: int):
-    if 0 <= charID < len(_VAULT_HUNTERS):
-        return _VAULT_HUNTERS[charID]
-    return None
-
-####
-
-build_mod(hooks=[HandleNewCharacter,Display])
+build_mod(hooks=[HandleNewCharacter,Display,PostSavesUpdated,OnSpawn,IsPlayerRestricted,TranslateUseFailure])
 
 __version__: str
 __version_info__: tuple[int, ...]

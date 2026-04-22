@@ -1,6 +1,6 @@
 [project]
 name = "Character Vault"
-version = "1.0.5"
+version = "1.1.0"
 authors = [{ name = "BioHazardAlBatros" }]
 description = "Allows to create new saves for custom characters and PT3 characters."
 
