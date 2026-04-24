@@ -1,5 +1,5 @@
-import unrealsdk
-from mods_base import ENGINE, build_mod, NestedOption, GroupedOption, SliderOption, SpinnerOption, ButtonOption
+import unrealsdk, json
+from mods_base import ENGINE, build_mod, NestedOption, GroupedOption, SliderOption, SpinnerOption, ButtonOption, SETTINGS_DIR
 from .rarities import DROP_ShortLived, DROP_LongLived, DROP_LiveForever, ModifiedRarities, VanillaRarities, Rarity
 
 def ByteFromInt(ColorHex: int, ByteIndex: int) -> int:
@@ -69,8 +69,37 @@ def MakeRarityNestedOption(index: int, rarity: Rarity) -> NestedOption:
     
     return group
 
+def load_settings():
+    settings_file = SETTINGS_DIR / "CustomRarities.json"
+    if not settings_file.exists():
+        return None
+    try:
+        with open(settings_file, 'r') as f:
+            data = json.load(f)
+        options = data.get('options', {})
+        rarityEd = options.get('rarity_editor', {})
+        rarities = []
+        for key in sorted(rarityEd.keys(), key=lambda x: int(x.split('_')[1])):
+            entry = rarityEd[key]
+            minLvl = entry['min_level']
+            maxLvl = entry['max_level']
+            a = entry['color_a']
+            r = entry['color_r']
+            g = entry['color_g']
+            b = entry['color_b']
+            colorInt = (a << 24) | (r << 16) | (g << 8) | b
+            lifespanEnum = LIFESPAN_VALUES[entry['lifespan']]
+            rarities.append(Rarity(MinLevel=minLvl, MaxLevel=maxLvl, Color=colorInt, DropLifeSpanType=lifespanEnum))
+        return rarities
+    except:
+        return None
+
+LoadedRarities = load_settings()
+if LoadedRarities is None:
+    LoadedRarities = VanillaRarities
+
 RarityStorage = []
-for i, rarityInfo in enumerate(ModifiedRarities):
+for i, rarityInfo in enumerate(LoadedRarities):
     RarityStorage.append(MakeRarityNestedOption(i, rarityInfo))
 
 RarityEditor = NestedOption(identifier="rarity_editor", display_name="Rarity Editor", children=RarityStorage)
@@ -125,7 +154,7 @@ def RemoveLastRarityCallback(button):
 build_mod(
     options=[
         RarityEditor,
-        ButtonOption(identifier="apply_btn", display_name="Apply Current Rarities", on_press=ApplyRaritiesCallback),
+        #ButtonOption(identifier="apply_btn", display_name="Apply Current Rarities", on_press=ApplyRaritiesCallback),
         ButtonOption(identifier="reset_btn", display_name="Reset to Default Modified", on_press=ResetRaritiesCallback),
         ButtonOption(identifier="vanilla_btn", display_name="Load Vanilla Rarities", on_press=LoadVanillaRaritiesCallback),
         ButtonOption(identifier="add_btn", display_name="Add New Rarity", on_press=AddNewRarityCallback),
