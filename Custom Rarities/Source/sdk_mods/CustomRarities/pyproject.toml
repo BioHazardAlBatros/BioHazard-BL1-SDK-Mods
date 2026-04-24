@@ -1,0 +1,13 @@
+[project]
+name = "CustomRarities"
+version = "1.0.0"
+authors = [{ name = "BioHazardAlBatros" }]
+description = "Allows to edit rarity color levels array through mod menu."
+
+[tool.sdkmod]
+name = "CustomRarities"
+mod_type = "Standard" # or "Library"
+supported_games = ["BL1","BL1E"]
+coop_support = "Client Side"
+auto_enable = true
+license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }

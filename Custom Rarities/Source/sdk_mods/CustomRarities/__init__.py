@@ -1,0 +1,135 @@
+import unrealsdk
+from mods_base import ENGINE, build_mod, NestedOption, GroupedOption, SliderOption, SpinnerOption, ButtonOption
+from .rarities import DROP_ShortLived, DROP_LongLived, DROP_LiveForever, ModifiedRarities, VanillaRarities, Rarity
+
+def ByteFromInt(ColorHex: int, ByteIndex: int) -> int:
+    return (ColorHex >> (ByteIndex * 8)) & 0xFF
+
+def MakeColor(ColorHex: int):
+    return unrealsdk.make_struct("Color", B=ByteFromInt(ColorHex, 0), G=ByteFromInt(ColorHex, 1), R=ByteFromInt(ColorHex, 2), A=ByteFromInt(ColorHex, 3))
+
+def MakeRarity(newRarity: Rarity):
+    return unrealsdk.make_struct("RarityLevelColor", MinLevel=newRarity.MinLevel, MaxLevel=newRarity.MaxLevel, Color=MakeColor(newRarity.Color), DropLifeSpanType=newRarity.DropLifeSpanType)
+
+def GetRarityArray():
+    return ENGINE.DynamicLoadObject("gd_globals.General.Globals", unrealsdk.find_class("GlobalsDefinition"), False).RarityLevelColors
+
+def ReplaceRarities(newRarities: list[Rarity]):
+    arr = GetRarityArray()
+    arr.clear()
+    for rarityInfo in newRarities:
+        arr.append(MakeRarity(rarityInfo))
+
+LIFESPAN_NAMES = {DROP_ShortLived: "ShortLived", DROP_LongLived: "LongLived", DROP_LiveForever: "LiveForever"}
+LIFESPAN_VALUES = {v: k for k, v in LIFESPAN_NAMES.items()}
+
+def patchRarityByIndex(index: int, group: GroupedOption):
+    minLvl = group.children[0].value
+    maxLvl = group.children[1].value
+    a = int(group.children[2].value)
+    r = int(group.children[3].value)
+    g = int(group.children[4].value)
+    b = int(group.children[5].value)
+    colorInt = (a << 24) | (r << 16) | (g << 8) | b
+    lifespanEnum = LIFESPAN_VALUES[group.children[6].value]
+    
+    arr = GetRarityArray()
+    if index >= len(arr):
+        return
+    arr[index].MinLevel = int(minLvl)
+    arr[index].MaxLevel = int(maxLvl)
+    arr[index].Color = MakeColor(colorInt)
+    arr[index].DropLifeSpanType = int(lifespanEnum)
+
+def watameFactory(index: int, group: GroupedOption):
+    def on_change(option, value):
+        patchRarityByIndex(index, group)
+    return on_change
+
+def MakeRarityNestedOption(index: int, rarity: Rarity) -> NestedOption:
+    a = ByteFromInt(rarity.Color, 3)
+    r = ByteFromInt(rarity.Color, 2)
+    g = ByteFromInt(rarity.Color, 1)
+    b = ByteFromInt(rarity.Color, 0)
+    lifespan_name = LIFESPAN_NAMES.get(rarity.DropLifeSpanType, "ShortLived")
+
+    minSlider = SliderOption(identifier="min_level", display_name="Min Level", value=rarity.MinLevel, min_value=-1, max_value=800, step=1, is_integer=True)
+    maxSlider = SliderOption(identifier="max_level", display_name="Max Level", value=rarity.MaxLevel, min_value=-1, max_value=800, step=1, is_integer=True)
+    alphaSlider = SliderOption(identifier="color_a", display_name="Alpha", value=a, min_value=0, max_value=255, step=1, is_integer=True)
+    redSlider = SliderOption(identifier="color_r", display_name="Red", value=r, min_value=0, max_value=255, step=1, is_integer=True)
+    greenSlider = SliderOption(identifier="color_g", display_name="Green", value=g, min_value=0, max_value=255, step=1, is_integer=True)
+    blueSlider = SliderOption(identifier="color_b", display_name="Blue", value=b, min_value=0, max_value=255, step=1, is_integer=True)
+    lifespanSpinner = SpinnerOption(identifier="lifespan", display_name="Drop Lifespan", value=lifespan_name, choices=["ShortLived", "LongLived", "LiveForever"], wrap_enabled=False)
+    
+    group = NestedOption(identifier=f"rarity_{index}", display_name=f"[{index}]", children=[minSlider, maxSlider, alphaSlider, redSlider, greenSlider, blueSlider, lifespanSpinner])
+    
+    changeCallback = watameFactory(index, group)
+    for option in group.children:
+        option.on_change = changeCallback
+    
+    return group
+
+RarityStorage = []
+for i, rarityInfo in enumerate(ModifiedRarities):
+    RarityStorage.append(MakeRarityNestedOption(i, rarityInfo))
+
+RarityEditor = NestedOption(identifier="rarity_editor", display_name="Rarity Editor", children=RarityStorage)
+
+def RebuildOptionMenu(newStorage):
+    global RarityStorage, RarityEditor
+    RarityStorage = newStorage
+    RarityEditor.children = RarityStorage
+    PushLiveUpdate()
+
+def PushLiveUpdate():
+    storage = []
+    for i, group in enumerate(RarityStorage):
+        minLvl = group.children[0].value
+        maxLvl = group.children[1].value
+        a = int(group.children[2].value)
+        r = int(group.children[3].value)
+        g = int(group.children[4].value)
+        b = int(group.children[5].value)
+        colorInt = (a << 24) | (r << 16) | (g << 8) | b
+        lifespanEnum = LIFESPAN_VALUES[group.children[6].value]
+        storage.append(Rarity(MinLevel=minLvl, MaxLevel=maxLvl, Color=colorInt, DropLifeSpanType=lifespanEnum))
+    ReplaceRarities(storage)
+
+def ApplyRaritiesCallback(button):
+    PushLiveUpdate()
+
+def ResetRaritiesCallback(button):
+    newStorage = []
+    for i, rarityInfo in enumerate(ModifiedRarities):
+        newStorage.append(MakeRarityNestedOption(i, rarityInfo))
+    RebuildOptionMenu(newStorage)
+
+def LoadVanillaRaritiesCallback(button):
+    newStorage = []
+    for i, rarityInfo in enumerate(VanillaRarities):
+        newStorage.append(MakeRarityNestedOption(i, rarityInfo))
+    RebuildOptionMenu(newStorage)
+
+def AddNewRarityCallback(button):
+    newStorage = list(RarityStorage)
+    newRarity = Rarity(MinLevel=0, MaxLevel=0, Color=0xFFFFFFFF, DropLifeSpanType=DROP_ShortLived)
+    newStorage.append(MakeRarityNestedOption(len(newStorage), newRarity))
+    RebuildOptionMenu(newStorage)
+
+def RemoveLastRarityCallback(button):
+    if len(RarityStorage) <= 1:
+        return
+    newStorage = RarityStorage[:-1]
+    RebuildOptionMenu(newStorage)
+
+build_mod(
+    options=[
+        RarityEditor,
+        ButtonOption(identifier="apply_btn", display_name="Apply Current Rarities", on_press=ApplyRaritiesCallback),
+        ButtonOption(identifier="reset_btn", display_name="Reset to Default Modified", on_press=ResetRaritiesCallback),
+        ButtonOption(identifier="vanilla_btn", display_name="Load Vanilla Rarities", on_press=LoadVanillaRaritiesCallback),
+        ButtonOption(identifier="add_btn", display_name="Add New Rarity", on_press=AddNewRarityCallback),
+        ButtonOption(identifier="remove_btn", display_name="Remove Last Rarity", on_press=RemoveLastRarityCallback)
+    ],
+    on_enable=PushLiveUpdate
+)
