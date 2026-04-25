@@ -1,5 +1,6 @@
 import unrealsdk, json
-from mods_base import ENGINE, build_mod, NestedOption, GroupedOption, SliderOption, SpinnerOption, ButtonOption, SETTINGS_DIR
+from unrealsdk.hooks import Type
+from mods_base import ENGINE, build_mod, NestedOption, GroupedOption, SliderOption, SpinnerOption, ButtonOption, SETTINGS_DIR, get_pc, keybind, EInputEvent,hook
 from .rarities import DROP_ShortLived, DROP_LongLived, DROP_LiveForever, ModifiedRarities, VanillaRarities, Rarity
 
 def ByteFromInt(ColorHex: int, ByteIndex: int) -> int:
@@ -41,9 +42,39 @@ def patchRarityByIndex(index: int, group: GroupedOption):
     arr[index].Color = MakeColor(colorInt)
     arr[index].DropLifeSpanType = int(lifespanEnum)
 
+def ChangePauseVisibility():
+    pc = get_pc(possibly_loading=True)
+    if pc is None:
+        return
+    manager = pc.GFxUIManager
+    if manager is None:
+        return
+    if len(manager.ScreenMovies) > 0:
+        manager.ScreenMovies[0].bRenderingDisabled = not manager.ScreenMovies[0].bRenderingDisabled 
+
+@hook("WillowGame.WillowGFxMenuPause:HandleInputKey", Type.PRE)
+def PauseHook(obj, args, ret, func):
+    if args.ukey == "F1" and args.uevent == 0:
+        ChangePauseVisibility()
+
+def updateColorPreview(a:int, r: int, g: int, b: int):
+    pc = get_pc(possibly_loading=True)
+    if pc is None:
+        return
+    hud = pc.myHUD
+    if hud is None:
+        return
+    movie = hud.GetHUDMovie()
+    if movie is None:
+        return
+    movie.CriticalTextMessages[0].MessageArray.clear()
+    color = unrealsdk.make_struct("Color", A=a, R=r, G=g, B=b)
+    pc.DisplayHUDMessage(1, "COLOR PREVIEW [F1 toggles pause menu]", 0.5, color)
+
 def watameFactory(index: int, group: GroupedOption):
     def on_change(option, value):
         patchRarityByIndex(index, group)
+        updateColorPreview(int(group.children[2].value),int(group.children[3].value),int(group.children[4].value),int(group.children[5].value))
     return on_change
 
 def MakeRarityNestedOption(index: int, rarity: Rarity) -> NestedOption:
@@ -61,7 +92,11 @@ def MakeRarityNestedOption(index: int, rarity: Rarity) -> NestedOption:
     blueSlider = SliderOption(identifier="color_b", display_name="Blue", value=b, min_value=0, max_value=255, step=1, is_integer=True)
     lifespanSpinner = SpinnerOption(identifier="lifespan", display_name="Drop Lifespan", value=lifespan_name, choices=["ShortLived", "LongLived", "LiveForever"], wrap_enabled=False)
     
-    group = NestedOption(identifier=f"rarity_{index}", display_name=f"[{index}]", children=[minSlider, maxSlider, alphaSlider, redSlider, greenSlider, blueSlider, lifespanSpinner])
+    group = NestedOption(
+        identifier=f"rarity_{index}", 
+        display_name=f"[{index}]", 
+        #display_name=f"[{index}] <font color='#{r:02X}{g:02X}{b:02X}'>Preview</font>", 
+        children=[minSlider, maxSlider, alphaSlider, redSlider, greenSlider, blueSlider, lifespanSpinner])
     
     changeCallback = watameFactory(index, group)
     for option in group.children:
@@ -152,6 +187,7 @@ def RemoveLastRarityCallback(button):
     RebuildOptionMenu(newStorage)
 
 build_mod(
+    hooks=[PauseHook],
     options=[
         RarityEditor,
         #ButtonOption(identifier="apply_btn", display_name="Apply Current Rarities", on_press=ApplyRaritiesCallback),
