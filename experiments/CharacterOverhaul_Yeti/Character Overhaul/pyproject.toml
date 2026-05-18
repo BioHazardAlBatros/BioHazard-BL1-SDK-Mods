@@ -1,0 +1,13 @@
+[project]
+name = "Character Overhaul"
+version = "1.0.0"
+authors = [{ name = "test" }]
+description = "CO Test"
+
+[tool.sdkmod]
+name = "Character Overhaul"
+mod_type = "Standard" # or "Library"
+supported_games = ["BL1"]
+coop_support = "Unknown"
+auto_enable = "True"
+license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }
