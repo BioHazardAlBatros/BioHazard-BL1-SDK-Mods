@@ -1,0 +1,14 @@
+[project]
+name = "ColorEnhancer"
+version = "1.0.0"
+authors = [{ name = "BioHazardAlBatros" }]
+description = "Removes desaturation and improves color grading."
+
+[tool.sdkmod]
+name = "Color Enhancer"
+mod_type = "Standard"
+supported_games = ["BL1"]
+coop_support = "ClientSide"
+auto_enable = true
+license = {name = "GPL3", url = "https://choosealicense.com/licenses/gpl-3.0/" }
+#download = "https://github.com/BioHazardAlBatros/BioHazard-BL1-SDK-Mods/raw/refs/heads/master/CharacterVault/CharacterVault.sdkmod"

@@ -5,7 +5,7 @@ authors = [{ name = "BioHazardAlBatros" }]
 description = "Allows to edit rarities."
 
 [tool.sdkmod]
-name = "CustomRarities"
+name = "Custom Rarities"
 mod_type = "Standard" # or "Library"
 supported_games = ["BL1"] #,"BL1E"]
 coop_support = "Unknown"
