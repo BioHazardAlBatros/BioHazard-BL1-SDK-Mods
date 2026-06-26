@@ -7,7 +7,7 @@ description = "Allows to edit rarities."
 [tool.sdkmod]
 name = "Custom Rarities"
 mod_type = "Standard" # or "Library"
-supported_games = ["BL1"] #,"BL1E"]
+supported_games = ["BL1", "BL1E"]
 coop_support = "Unknown"
 auto_enable = true
 download = "https://github.com/BioHazardAlBatros/BioHazard-BL1-SDK-Mods/raw/refs/heads/master/Custom%20Rarities/CustomRarities.sdkmod"

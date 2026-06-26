@@ -7,7 +7,7 @@ description = "Removes desaturation and improves color grading."
 [tool.sdkmod]
 name = "Color Enhancer"
 mod_type = "Standard"
-supported_games = ["BL1"]
+supported_games = ["BL1","BL1E"]
 coop_support = "ClientSide"
 auto_enable = true
 download = "https://github.com/BioHazardAlBatros/BioHazard-BL1-SDK-Mods/raw/refs/heads/master/Color%20Enhancer/ColorEnhancer.sdkmod"
