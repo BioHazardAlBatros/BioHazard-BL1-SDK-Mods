@@ -2,56 +2,9 @@ import unrealsdk
 from unrealsdk import logging, find_all, load_package,make_struct
 from unrealsdk.hooks import Type, add_hook, remove_hook, Block
 from unrealsdk.unreal import UObject, WrappedStruct, BoundFunction, UScriptStruct, WeakPointer
-from mods_base import get_pc,hook,ENGINE,EInputEvent,build_mod,keybind, BaseOption, BoolOption, SliderOption
+from mods_base import Game, Mod, get_pc,hook,ENGINE,EInputEvent,build_mod,keybind, BaseOption, BoolOption, SliderOption
 from typing import Any
 
-ShopResetTimerOption = SliderOption(
-    "Shop Reset in Minutes",
-    20,
-    5,
-    20,
-    1,
-    True,
-    description="Choose how fast you want to reset the shops.\nDefault Value: 20",
-    on_change_while_enabled: changeShopTimer
-)
-
-AllowGamepadIconsOption = BoolOption(
-    "Allow Xbox 360 Buttons",
-    True,
-    "On",
-    "Off",
-    description="With this enabled, game will be allowed to use gamepad icons.",
-    on_change_while_enabled: allowIcons
-)
-
-BuffEndGameCommdecksOption = BoolOption(
-    "Buff Endgame Command Decks",
-    True,
-    "On",
-    "Off",
-    description="With this enabled, every single commdeck in the game will be more powerful.",
-    on_change_while_enabled: buffCommdecks
-)
-
-GuaranteedKamikazeDropsOption = BoolOption(
-    "Buff Endgame Command Decks",
-    True,
-    "On",
-    "Off",
-    description="With this enabled, every claptrap kamikaze in the game will have a guaranteed rare item drop (Makes finding all rare collectables from the DLC really easy).",
-    on_change_while_enabled: patchKamikazes
-)
-
-NewBankSDUOption = BoolOption(
-    "New Bank SDU in Shop",
-    True,
-    "On",
-    "Off",
-    description="With this enabled, there will be a new level of Bank SDU in Marcuses's Ammo Vendor that will give you a total of 256 gear slot for your bank."
-)
-
-MiniModCollection = [ShopResetTimerOption, AllowGamepadIconsOption, BuffEndGameCommdecksOption, GuaranteedKamikazeDropsOption, NewBankSDUOption]
 prepWorkDone = False
 Globals = None
 DLC1Globals = None
@@ -62,9 +15,8 @@ DLC4Globals = None
 commDeckValueConstant = 11
 def buffCommdecks(_: BoolOption, value: bool) -> None:
     global commDeckValueConstant
-    CommDeckFormula = ENGINE.DynamicLoadObject("gd_CommandDecks.Attributes.INI_SlotBaseGrade",unrealsdk.find_class("AttributeInitializationDefinition"), False).ConditionalInitialization.ConditionalExpressionList
-    logging.info(f"{CommDeckFormula.ObjectFlags}")
-    logging.info(f"{CommDeckFormula.ObjectFlags | 0x4000}")
+    CommDeckAttribute = ENGINE.DynamicLoadObject("gd_CommandDecks.Attributes.INI_SlotBaseGrade",unrealsdk.find_class("AttributeInitializationDefinition"), False)
+    CommDeckFormula = CommDeckAttribute.ConditionalInitialization.ConditionalExpressionList
     CommDeckFormula[5].BaseValueIfTrue.BaseValueConstant, commDeckValueConstant = commDeckValueConstant, CommDeckFormula[5].BaseValueIfTrue.BaseValueConstant
 
 def createBankSDU() -> None:
@@ -97,6 +49,7 @@ def createBankSDU() -> None:
     MoxxiShop.DefaultLoot[0].ItemAttachments[-1].ItemPool = NewItemPool
     return
 
+#Broken in Enhanced
 def changeShopTimer(_: SliderOption,value: int) -> None:
     if prepWorkDone is True:
         for global_var in [Globals, DLC1Globals, DLC2Globals, DLC3Globals, DLC4Globals]:
@@ -124,9 +77,67 @@ def BankUpgradeBypass(obj: UObject, __args: WrappedStruct, __ret: Any, __func: B
     player = __args.MyInstigatorObject.InvManager.StashSlots = obj.NewStashSlotCount
     return
 
+ShopResetTimerOption = SliderOption(
+    "Shop Reset in Minutes",
+    20,
+    5,
+    20,
+    1,
+    True,
+    description="Choose how fast you want to reset the shops.\nDefault Value: 20",
+    on_change_while_enabled=changeShopTimer
+)
+
+AllowGamepadIconsOption = BoolOption(
+    "Allow Xbox 360 Buttons",
+    True,
+    "On",
+    "Off",
+    description="With this enabled, game will be allowed to use gamepad icons.",
+    on_change_while_enabled=allowIcons
+)
+
+BuffEndGameCommdecksOption = BoolOption(
+    "Buff Endgame Command Decks",
+    True,
+    "On",
+    "Off",
+    description="With this enabled, every single commdeck in the game will be more powerful.",
+    on_change_while_enabled=buffCommdecks
+)
+
+GuaranteedKamikazeDropsOption = BoolOption(
+    "Guaranteed Kamikaze Drops",
+    True,
+    "On",
+    "Off",
+    description="With this enabled, every claptrap kamikaze in the game will have a guaranteed rare item drop (Makes finding all rare collectables from the DLC really easy).",
+    on_change_while_enabled=patchKamikazes
+)
+
+NewBankSDUOption = BoolOption(
+    "New Bank SDU in Shop",
+    True,
+    "On",
+    "Off",
+    description="With this enabled, there will be a new level of Bank SDU in Marcuses's Ammo Vendor that will give you a total of 256 gear slot for your bank."
+)
+
+MiniModCollection = [ShopResetTimerOption, BuffEndGameCommdecksOption, GuaranteedKamikazeDropsOption, NewBankSDUOption]
+#BL1 Specific Mods
+if Game.get_current().name == "BL1":
+    MiniModCollection.append(AllowGamepadIconsOption)
+#BL1E Specific Mods
+#if Game.get_current().name == "BL1E":
+
+
 def patch(enabled: bool):
+    #BL1 Specific Mods
+    if Game.get_current().name == "BL1":
+        allowIcons(AllowGamepadIconsOption,AllowGamepadIconsOption.value if enabled else False)
+    #BL1E Specific Mods
+    #if Game.get_current().name == "BL1E":
     changeShopTimer(ShopResetTimerOption,ShopResetTimerOption.value if enabled else 20)
-    allowIcons(AllowGamepadIconsOption,AllowGamepadIconsOption.value if enabled else False)
     buffCommdecks(BuffEndGameCommdecksOption,BuffEndGameCommdecksOption.value if enabled else False)
     patchKamikazes(GuaranteedKamikazeDropsOption,GuaranteedKamikazeDropsOption.value if enabled else False)
     prepWorkDone = enabled
@@ -138,15 +149,15 @@ def on_enable():
     DLC2Globals = ENGINE.DynamicLoadObject("dlc2_packagedefinition.CustomGlobals",unrealsdk.find_class("GlobalsDefinition"),False)
     DLC3Globals = ENGINE.DynamicLoadObject("dlc3_PackageDefinition.CustomGlobals",unrealsdk.find_class("GlobalsDefinition"),False)
     DLC4Globals = ENGINE.DynamicLoadObject("dlc4_PackageDefinition.CustomGlobals",unrealsdk.find_class("GlobalsDefinition"),False)
-    Globals |= 0x4000
-    DLC1Globals |= 0x4000
-    DLC2Globals |= 0x4000
-    DLC3Globals |= 0x4000
-    DLC4Globals |= 0x4000
+    Globals.ObjectFlags |= 0x4000
+    DLC1Globals.ObjectFlags |= 0x4000
+    DLC2Globals.ObjectFlags |= 0x4000
+    DLC3Globals.ObjectFlags |= 0x4000
+    DLC4Globals.ObjectFlags |= 0x4000
     createBankSDU()
     patch(True)
 
-def on_disable = lambda: patch(False)
+on_disable = lambda: patch(False)
 
 __version__: str
 __version_info__: tuple[int, ...]

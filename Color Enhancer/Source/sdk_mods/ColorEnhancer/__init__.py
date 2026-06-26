@@ -1,10 +1,11 @@
 import unrealsdk
-from mods_base import build_mod, hook,ENGINE, BoolOption
+from mods_base import build_mod, hook,ENGINE, BoolOption, Game
 from unrealsdk.hooks import Type
 from unrealsdk.unreal import UObject, WrappedStruct, BoundFunction
 from unrealsdk import logging
 from typing import Any
 
+CurrentGame = Game.get_current().name
 SaturationOption : BoolOption
 BoostFactor = 0.5 # maybe should become an option
 def setOnes(obj: UObject):
@@ -16,7 +17,8 @@ def setOnes(obj: UObject):
 
 def changePP(PostProcessEffect : UObject, DesaturationOnly: bool):
     PostProcessEffect.Scene_Desaturation = 0.0
-    if DesaturationOnly:
+    #BL1E either uses different desaturation system or almost doesnt desature at all
+    if DesaturationOnly and CurrentGame == "BL1":
         return
     setOnes(PostProcessEffect.Scene_Highlights)
     setOnes(PostProcessEffect.Scene_MidTones)
@@ -38,6 +40,9 @@ def MapChanged(obj:UObject, args:WrappedStruct, ret:Any, func:BoundFunction) -> 
     patchAllPP(SaturationOption, SaturationOption.value)
 
 SaturationOption = BoolOption("Remove desaturation only", True, "Yes", "No", description="With this enabled, only desaturation will be removed. Note: You'll see reverted changes only in the next map.", on_change = patchAllPP )
+ModOptions = []
+if CurrentGame == "BL1":
+    ModOptions.append(SaturationOption)
 
-build_mod(hooks=[MapChanged],options=[SaturationOption])
+build_mod(options=ModOptions,hooks=[MapChanged])
 logging.info(f"Color Enhancer Loaded.")

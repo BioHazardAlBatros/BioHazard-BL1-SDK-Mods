@@ -100,7 +100,7 @@ def MakeRarityNestedOption(index: int, rarity: Rarity) -> NestedOption:
     
     changeCallback = watameFactory(index, group)
     for option in group.children:
-        option.on_change = changeCallback
+        option.on_change_anytime = changeCallback
     
     return group
 
