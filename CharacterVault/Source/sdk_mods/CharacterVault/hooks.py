@@ -47,17 +47,21 @@ def IsPlayerRestricted(obj: UObject, args: WrappedStruct, ret: any, func):
     if requiredClassID == 0:
         return (Block, False)
     WillowPlayerController = args.PawnToCheck.Controller
+    if WillowPlayerController.Class.Name == "WillowMind":
+        logging.info(obj)
+        return None
     if WillowPlayerController is None or WillowPlayerController.PlayerClass is None:
         return None
     classID = WillowPlayerController.PlayerClass.CharacterName
     return (Block, (classID + 1) != requiredClassID)
 
-@hook(hook_func="WillowGame.WillowItem:TranslateUseFailure", hook_type=Type.PRE)
+@hook(hook_func="WillowGame.WillowItem:TranslateUseFailure", hook_type=Type.POST)
 def TranslateUseFailure(obj: UObject, args: WrappedStruct, ret: any, func):
     if args.FailureFlag != 16:
         return
-    args.Output = "Hello World"
-    return (Block,(args.Other,"Hello World"))
+    args.Output = "Hello World %s"
+    print(args)
+    return
 
 def OnCharacterSelected(dlg, chosenBtn, PT3Selected, WillowGFxLobby, ControllerID, HighLevelCharacter):
     if chosenBtn.name == "Cancel":
@@ -135,12 +139,13 @@ def HandleNewCharacter(WillowGFxLobby: UObject, args: WrappedStruct, ret: any, f
             on_select=lambda dlg,chosenBtn: PT3SupportDlg(dlg,chosenBtn,WillowGFxLobby),
             on_cancel=lambda _:None )
         diffDlg.show()
-
     return Block
 
 try:
     FOVMod = __import__("FOV and sprint rotation fix")
-    def AdjustFOV(__obj, __args, __ret, __func):
+    def AdjustFOV(WillowPlayerController, __args, __ret, __func):
+        CurrentVH = get_character_info_from_class_definition(WillowPlayerController)
+        ENGINE.DynamicLoadObject(CurrentVH.playerClassDefinition, unrealsdk.find_class("PlayerClassDefinition"), False).FOV = FOVMod.WorldFOV.value
         FOVMod.WorldFOV.on_change(FOVMod.WorldFOV,FOVMod.WorldFOV.value)
     add_hook("WillowGame.WillowPlayerController:SpawningProcessComplete", Type.POST, "AdjustFOV", AdjustFOV)
 except:

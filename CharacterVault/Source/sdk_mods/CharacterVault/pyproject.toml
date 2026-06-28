@@ -7,7 +7,7 @@ description = "Allows to create new saves for custom characters and PT3 characte
 [tool.sdkmod]
 name = "Character Vault"
 mod_type = "Standard" # or "Library"
-supported_games = ["BL1"]
+supported_games = ["BL1","BL1E"]
 coop_support = "Unknown"
 auto_enable = true
 download = "https://github.com/BioHazardAlBatros/BioHazard-BL1-SDK-Mods/raw/refs/heads/master/CharacterVault/CharacterVault.sdkmod"
