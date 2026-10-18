@@ -4,6 +4,7 @@ from unrealsdk.hooks import Type, Block
 from unrealsdk.unreal import UObject, WrappedStruct, BoundFunction
 from unrealsdk import logging,find_object, find_class
 from CharacterVault import add_custom_character_class
+
 BlitzCharID = None
 
 def load_obj(objname,classobj):
@@ -44,6 +45,5 @@ def OnPlayerSpawn():
     pawn.CameraScaleRight = 2.0
 
 BlitzCharID = add_custom_character_class("Stormtrooper","Blitz The Stormtrooper","Blitz.Character.CharacterClass_Roland", "Blitz", BaseVanillaClass = 4, SpawnCallback = OnPlayerSpawn)
-#BlitzCharID = add_custom_character_class("%d\0","Blitz The Stormtrooper","Blitz.Character.CharacterClass_Roland", "Blitz", BaseVanillaClass = 4, SpawnCallback = OnPlayerSpawn)
 
 build_mod(hooks=[ModifyGlobals])
