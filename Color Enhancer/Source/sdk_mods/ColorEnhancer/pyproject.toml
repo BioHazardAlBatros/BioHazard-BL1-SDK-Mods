@@ -1,6 +1,6 @@
 [project]
 name = "ColorEnhancer"
-version = "1.0.1"
+version = "1.0.2"
 authors = [{ name = "BioHazardAlBatros" }]
 description = "Removes desaturation and improves color grading.\n[Enhanced Only]: Only colors are boosted"
 

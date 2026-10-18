@@ -17,12 +17,13 @@ except:
     pass
 #########################
 
-@hook(hook_func="WillowGame.WillowPlayerController:SpawningProcessComplete", hook_type=Type.POST)
+@hook(hook_func="WillowGame.WillowPlayerController:Possess", hook_type=Type.POST)
 def OnSpawn(WillowPlayerController: UObject, args: WrappedStruct, ret: any, func):
     CurrentVH = get_character_info_from_class_definition(WillowPlayerController)
     if CurrentVH.isCustom:
         WillowPlayerController.PlayerClass.CharacterName = CurrentVH.charID
-    if CurrentVH.onStart != None:
+        #WillowHUDGFxMovie = 
+    if CurrentVH is not None and CurrentVH.onStart != None:
         CurrentVH.onStart()
 
 @hook(hook_func="WillowGame.WillowGFxLobbyLoadCharacter:SavesUpdated", hook_type=Type.PRE)
@@ -32,12 +33,18 @@ def PostSavesUpdated(obj: UObject, args: WrappedStruct, ret: any, func):
         return
     for playerSave in SaveGameHelper.SaveGames:
         if playerSave.CharacterClass == 4:  # CN_MAX
-            classID = get_character_id_from_class_definition(playerSave.ClassName)
-            if classID != -1:
-                playerSave.CharacterClass = classID
+            playerSave.CharacterClass = get_character_id_from_class_definition(playerSave.ClassName)
+            #if classID != -1:
+            #     playerSave.CharacterClass = playerSave.CharacterClass = classID
+
+#@hook(hook_func="WillowGame.WillowPlayerController:ValidateItemDefinition", hook_type=Type.PRE)
+#def BypassSanityItemChecker(obj: UObject, args: WrappedStruct, ret: any, func):
+#    return (Block, True)
 
 @hook(hook_func="WillowGame.WillowGFxMenuHelperSaveGame:GetCharName", hook_type=Type.PRE)
 def Display(obj: UObject, args: WrappedStruct, ret: any, func):
+    if args.ClassName == 255:
+        return (Block,"Unknown")
     classname = _VAULT_HUNTERS[args.ClassName].classname if args.bWantClassName else _VAULT_HUNTERS[args.ClassName].defaultName
     return (Block,classname)
 
@@ -59,8 +66,7 @@ def IsPlayerRestricted(obj: UObject, args: WrappedStruct, ret: any, func):
 def TranslateUseFailure(obj: UObject, args: WrappedStruct, ret: any, func):
     if args.FailureFlag != 16:
         return
-    args.Output = "Hello World %s"
-    print(args)
+    #args.Output = "Hello World %s"
     return
 
 def OnCharacterSelected(dlg, chosenBtn, PT3Selected, WillowGFxLobby, ControllerID, HighLevelCharacter):

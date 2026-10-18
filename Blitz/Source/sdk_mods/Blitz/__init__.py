@@ -4,7 +4,6 @@ from unrealsdk.hooks import Type, Block
 from unrealsdk.unreal import UObject, WrappedStruct, BoundFunction
 from unrealsdk import logging,find_object, find_class
 from CharacterVault import add_custom_character_class
-
 BlitzCharID = None
 
 def load_obj(objname,classobj):

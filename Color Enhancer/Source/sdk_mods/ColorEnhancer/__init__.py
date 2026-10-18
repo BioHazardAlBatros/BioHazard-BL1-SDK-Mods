@@ -6,6 +6,7 @@ from unrealsdk import logging
 from typing import Any
 
 CurrentGame = Game.get_current().name
+PPTouched = False
 SaturationOption : BoolOption
 BoostFactor = 0.5 # maybe should become an option
 def setOnes(obj: UObject):
@@ -25,9 +26,13 @@ def changePP(PostProcessEffect : UObject, DesaturationOnly: bool):
     return
 
 def patchAllPP(option: BoolOption, value: bool):
+    global PPTouched
+    if PPTouched:
+        return
     volumes = unrealsdk.find_all("PostProcessVolume")
     for volume in volumes:
         changePP(volume.Settings, value)
+    PPTouched = True
 
 def on_enable():
     ubers = unrealsdk.find_all("UberPostProcessEffect") # does something on some maps, but not main menu
@@ -37,6 +42,8 @@ def on_enable():
 
 @hook(hook_func="WillowGame.WillowGameInfo:PostCommitMapChange", hook_type=Type.POST)
 def MapChanged(obj:UObject, args:WrappedStruct, ret:Any, func:BoundFunction) -> Any:
+    global PPTouched
+    PPTouched = False
     patchAllPP(SaturationOption, SaturationOption.value)
 
 SaturationOption = BoolOption("Remove desaturation only", True, "Yes", "No", description="With this enabled, only desaturation will be removed. Note: You'll see reverted changes only in the next map.", on_change = patchAllPP )

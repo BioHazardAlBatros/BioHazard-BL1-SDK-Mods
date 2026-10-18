@@ -19,7 +19,13 @@ _VAULT_HUNTERS = [
     VaultHunter(charID=3,classname="Berserker",charDesc="Default Berserker",playerClassDefinition="gd_Brick.Character.CharacterClass_Brick",defaultName="Brick",defaultProfile="default brick"),
 ]
 
+#makes more sense to move all of it into a class actually
 _CLASS_IDS: Dict[str, int] = {
     vh.playerClassDefinition: vh.charID
+    for vh in _VAULT_HUNTERS
+}
+
+_AS_NAMES: Dict[int, str] = {
+    vh.charID: vh.defaultName.lower()
     for vh in _VAULT_HUNTERS
 }
