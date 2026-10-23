@@ -235,6 +235,7 @@ def hide_apple(hud: UObject):
     invoker.Method = f"_root.badapple.setAppleVisible"
     hud.Invoke(invoker)
 
+
 def reload_apple(hud: UObject):
     load_custom_movie(hud, "badapple.swf", "_root","badapple",9999)
 
@@ -242,7 +243,7 @@ def ShowApple(HUD):
     #load_custom_icon(HUD, "HUDBL2.swf", "p1")
     #get_pc().PlaySound(_cached_cue)
     #manually get lyrics starting from 3rd minute
-    return
+    #return
     if HUD.GetVariableString("_root.badapple") == "_level0.badapple" and HUD.GetVariableBool("p1.character._visible") is True:
         invoke_apple(HUD)
     else:
@@ -255,8 +256,3 @@ def HideApple(obj, args, ret, func):
         return;
     hide_apple(pc.MyHud.HUDMovie)
 
-ogg_path = get_asset_path("badapple.ogg")
-if os.path.exists(ogg_path):
-    init_sound_cue(ogg_path)
-#else:
-#    logging.info(f"badapple.ogg not found at {ogg_path}")

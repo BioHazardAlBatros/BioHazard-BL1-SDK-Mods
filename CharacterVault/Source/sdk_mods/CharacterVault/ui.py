@@ -56,8 +56,8 @@ def UpdateActionSkill(obj, args, ret, func):
     # other notable paths
     # p1.coop1.character, p1.coop2.character, p1.coop3.character, p1.dying1
     #obj.SetVariableBool("p1.character.flash._visible",False)
-    obj.SingleArgInvokeS("p1.character.gotoAndStop","mordecai")
-    ShowApple(obj)
+    obj.SingleArgInvokeS("p1.character.gotoAndStop","roland")
+    #ShowApple(obj)
     #load_custom_icon(obj,"frames.swf","p1.character.flash","plswork",9) # overlays on top, no matter what, doesn't have animation
     
 
@@ -67,4 +67,4 @@ def UpdateActiveActionSkill(obj,args, ret, func):
     # to do: the action bar doesn't reappear after closing inventory
     # to do: figure out how to replace to custom action bar
     #if args.bActivated:
-    obj.MyHud.HUDMovie.SingleArgInvokeS("p1.dying1.gotoAndStop","revive")
+    obj.MyHud.HUDMovie.SingleArgInvokeS("p1.dying1.gotoAndStop","roland_action")
